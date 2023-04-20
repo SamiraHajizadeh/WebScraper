@@ -6,7 +6,7 @@ def get_config(config):
   with open(config, 'r') as stream:
     return yaml.load(stream)
 
-class QuoteSpider(scrapy.Spider):
+class CoinSpider(scrapy.Spider):
 
   #def __init__(self):
   name = 'RPC_V1' #get_config('config.yaml')['scraper_name']
