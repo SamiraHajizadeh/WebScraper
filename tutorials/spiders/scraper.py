@@ -9,7 +9,7 @@ def get_config(config):
 class QuoteSpider(scrapy.Spider):
 
   #def __init__(self):
-  name = 'RPC_V1' #get_config('config.yaml')['scraper_name']
+  name = 'RPC_V4' #get_config('config.yaml')['scraper_name']
   start_urls = ['https://rpc.ashmus.ox.ac.uk/search/browse?volume_id=4'] # get_config('config.yaml')['start_urls']
 
   def start_requests(self):
