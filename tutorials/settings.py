@@ -63,12 +63,12 @@ ROBOTSTXT_OBEY = True
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-  "scrapy.pipelines.images.MyImagesPipeline": 1,
+  "tutorials.pipelines.MyImagesPipeline": 100,
   "tutorials.pipelines.CoinPipeline": 300,
 }
 
 
-FILES_STORE = "images"
+FILES_STORE = "/content/WebScraper/images"
 
 
 # Enable and configure the AutoThrottle extension (disabled by default)

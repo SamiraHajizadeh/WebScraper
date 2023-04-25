@@ -1,7 +1,7 @@
 # Define your item pipelines here
 # useful for handling different item types with a single interface
 
-
+import scrapy
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 from pathlib import PurePosixPath
@@ -11,9 +11,16 @@ from scrapy.pipelines.images import ImagesPipeline
 
 class CoinPipeline:
   def process_item(self, item, spider):
+
+
+
     adapter = ItemAdapter(item)
-        
-    if adapter.get('price'):
+
+
+    print('type is', adapter.keys())
+
+    if adapter.get('Volume'):
+      raise DropItem(f"Volume is not missing in {item}")
       if adapter.get('price_excludes_vat'):
         adapter['price'] = adapter['price'] * self.vat_factor
       return item
@@ -30,4 +37,16 @@ class MyImagesPipeline(ImagesPipeline):
 
     return image_filename
 
+
+  def get_media_requests(self, item, info):
+    for image_url in item['image_urls']:
+      yield scrapy.Request(image_url)
+
+  def item_completed(self, results, item, info):
+    image_paths = [x['path'] for ok, x in results if ok]
+    if not image_paths:
+      raise DropItem("Item contains no images")
+    adapter = ItemAdapter(item)
+    adapter['image_paths'] = image_paths
+    return item
 
