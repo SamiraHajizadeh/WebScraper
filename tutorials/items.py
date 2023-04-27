@@ -8,7 +8,17 @@ import scrapy
 
 class CoinItem(scrapy.Item):
 
-  title = scrapy.Field()
   volume = scrapy.Field()
+  no = scrapy.Field() ##
+  reign = scrapy.Field()
+  persons = scrapy.Field()
+  city = scrapy.Field()
+  region = scrapy.Field()
+  province = scrapy.Field()
+  denomination = scrapy.Field()
+  average_weight = scrapy.Field()
+  obverse = scrapy.Field() ##
+  reverse = scrapy.Field() ##
+  specimens = scrapy.Field() ##
   image_urls = scrapy.Field()
   images = scrapy.Field()
