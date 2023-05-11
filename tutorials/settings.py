@@ -68,7 +68,7 @@ ITEM_PIPELINES = {
 }
 
 
-FILES_STORE = "/content/WebScraper/images"
+IMAGES_STORE = "/content/WebScraper/images"
 
 
 # Enable and configure the AutoThrottle extension (disabled by default)
