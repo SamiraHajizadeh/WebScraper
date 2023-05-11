@@ -10,30 +10,20 @@ from scrapy.pipelines.images import ImagesPipeline
 
 
 class CoinPipeline:
+
   def process_item(self, item, spider):
 
-
-
     adapter = ItemAdapter(item)
-
-
-    print('type is', adapter.keys())
-
-    if adapter.get('Volume'):
-      raise DropItem(f"Volume is not missing in {item}")
-      if adapter.get('price_excludes_vat'):
-        adapter['price'] = adapter['price'] * self.vat_factor
-      return item
-    else:
-      raise DropItem(f"Missing price in {item}")
+    return item
 
 
 class MyImagesPipeline(ImagesPipeline):
 
   def file_path(self, request, response=None, info=None, *, item=None):
 
-    image_perspective = request.url.split('/')[-1]
-    image_filename = f'{image_perspective}.jpg'
+    images_number = request.url.split('/')[-1]
+    image_perspective = request.url.split('/')[-2]
+    image_filename = f'{image_perspective}-{images_number}.jpg'
 
     return image_filename
 
