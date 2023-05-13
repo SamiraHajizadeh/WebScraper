@@ -10,6 +10,10 @@ pip install scrapy
 ```
 
 ## Usage
+-Clone this repository using the following command:
+```
+git clone https://github.com/SamiraHajizadeh/WebScraper.git
+```
 
 - After installing scrapy, import os and scrapy as they will be used later on.
 ```
