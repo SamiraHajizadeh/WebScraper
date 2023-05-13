@@ -1,7 +1,7 @@
 import scrapy
 from pathlib import Path
 import yaml
-from tutorials.items import CoinItem
+from CoinScraper.items import CoinItem
 from scrapy import Request
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
