@@ -18,6 +18,13 @@ def concat_lists(lst1, lst2):
   return [lst1[i]+lst2[i] for i in range(max_size)]
 
 
+def get_data(response, xpath_addresses, item, data_names):
+  temp = {}
+  for i in range(len(data_names)):
+    temp[data_names[i]] = [ele.strip("\t\n\xa0 ") for ele in response.xpath(xpath_addresses[i]).extract()]
+  return temp
+
+
 class CoinSpider(CrawlSpider):
 
   name = 'RPC_V4'
@@ -32,35 +39,46 @@ class CoinSpider(CrawlSpider):
     item = CoinItem()
     if response.status == 200:
 
-      img = response.xpath("//img/@src")
+      images_links = [self.url_join(u, response) for u in response.xpath("//img/@src").extract()]
+      
+      addresses = ["//label[@for='volume' and .='Volume:']/following-sibling::text()[1]",
+                  "//label[@for='volume' and .='№:']/following-sibling::a[1]/text()",
+                  "//label[@for='reign' and .='Reign:']/following-sibling::a[1]/text()", 
+                  "//label[@for='persons' and .='Persons:']/following-sibling::a[1]/text()",
+                  "//label[@for='city' and .='City:']/following-sibling::a[1]/text()",
+                  "//label[@for='region' and .='Region:']/following-sibling::a[1]/text()",
+                  "//label[@for='province' and .='Province:']/following-sibling::a[1]/text()",
+                  "//label[@for='denomination' and .='Denomination:']/following-sibling::text()[1]",
+                  "//label[@for='average_weight' and .='Average weight:']/following-sibling::text()[1]",
+                  "//label[@for='specimens' and .='Specimens:']/following-sibling::text()[1]",
+                  "//label[@for='obverse' and .='Obverse:']/following-sibling::span[@class='inscription']/text()",
+                  "//label[@for='obverse' and .='Obverse:']/following-sibling::span[@class='inscription']/following-sibling::text()[1]",
+                  "//label[@for='reverse' and .='Reverse:']/following-sibling::span[@class='inscription']/text()",
+                  "//label[@for='reverse' and .='Reverse:']/following-sibling::span[@class='inscription']/following-sibling::text()[1]"
+                  ]
 
-      item['image_urls'] = self.url_join(img.extract(), response)
+      names = ["volume", "no", "reign", "persons", "city", "region", "province", "denomination", "average_weight", "specimens", "obverse1", "obverse2", "reverse1", "reverse2"]
 
-      item["volume"] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='volume' and .='Volume:']/following-sibling::text()[1]").extract()]
-      item["no"] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='volume' and .='№:']/following-sibling::a[1]/text()").extract()]
-      item['reign'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='reign' and .='Reign:']/following-sibling::a[1]/text()").extract()]
-      item['persons'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='persons' and .='Persons:']/following-sibling::a[1]/text()").extract()]
-      item['city'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='city' and .='City:']/following-sibling::a[1]/text()").extract()]
-      item['region'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='region' and .='Region:']/following-sibling::a[1]/text()").extract()]
-      item['province'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='province' and .='Province:']/following-sibling::a[1]/text()").extract()]
-      item['denomination'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='denomination' and .='Denomination:']/following-sibling::text()[1]").extract()]
-      item['average_weight'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='average_weight' and .='Average weight:']/following-sibling::text()[1]").extract()]
-      item['specimens'] = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='specimens' and .='Specimens:']/following-sibling::text()[1]").extract()]
 
-      obverse_part1 = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='obverse' and .='Obverse:']/following-sibling::span[@class='inscription']/text()").extract()]
-      obverse_part2 = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='obverse' and .='Obverse:']/following-sibling::span[@class='inscription']/following-sibling::text()[1]").extract()]
-      item['obverse'] = concat_lists(obverse_part1, obverse_part2)
+      data = get_data(response, addresses, item, names)
+      data["obverse"] = concat_lists(data["obverse1"], data["obverse2"])
+      data["reverse"] = concat_lists(data["reverse1"], data["reverse2"])
+      names = ["volume", "no", "reign", "persons", "city", "region", "province", "denomination", "average_weight", "specimens", "obverse", "reverse"]
 
-      reverse_part1 = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='reverse' and .='Reverse:']/following-sibling::span[@class='inscription']/text()").extract()]
-      reverse_part2 = [ele.strip("\t\n\xa0 ") for ele in response.xpath("//label[@for='reverse' and .='Reverse:']/following-sibling::span[@class='inscription']/following-sibling::text()[1]").extract()]
-      item['reverse'] = concat_lists(reverse_part1, reverse_part2)
+
+      for i in range(20):
+        item['image_urls'] = images_links[i]
+
+        for name in names:
+          if len(data[name]) > i:
+            item[name] = data[name][i]
+
+        yield item 
 
     next_url = response.xpath('//nav/ul/li[15]/a/@href').extract()
 
     if len(next_url):
       yield Request(next_url[0], callback=self.parse_item, meta={'item': item})
-
-    yield item
 
 
   def url_join(self, rel_img_urls, response):
