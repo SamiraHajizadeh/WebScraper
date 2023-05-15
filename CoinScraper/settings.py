@@ -11,7 +11,7 @@ ITEM_PIPELINES = {
 }
 
 
-IMAGES_STORE = "./WebScraper/images"
+IMAGES_STORE = "./images"
 
 REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
